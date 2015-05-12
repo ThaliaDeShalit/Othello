@@ -99,4 +99,10 @@ namespace Othello
         White,
         Empty
     }
+
+    public enum eColor
+    {
+        Black,
+        White
+    }
 }
