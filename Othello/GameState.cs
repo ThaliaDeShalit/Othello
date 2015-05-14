@@ -10,20 +10,69 @@ namespace Othello
         private Player m_SecondPlayer;
         private Player m_CurrentPlayer;
         private bool m_GameAgainstComputer;
-        private List<sMatrixCoordinate> m_validMoves;
         private eBoardCell[,] m_GameBoard;
 
         public GameState(string i_FirstPlayerName, string i_SecondPlayerName, int i_BoardSize, bool i_AginstComputer)
         {
-            m_FirstPlayer = new Player(i_FirstPlayerName, eColor.Black);
-            m_SecondPlayer = new Player(i_SecondPlayerName, eColor.White);
-
+            m_FirstPlayer = new Player(i_FirstPlayerName, eColor.Black, new sMatrixCoordinate((i_BoardSize / 2) - 1, (i_BoardSize / 2) - 1), new sMatrixCoordinate((i_BoardSize / 2), (i_BoardSize / 2)));
+            m_SecondPlayer = new Player(i_SecondPlayerName, eColor.White, new sMatrixCoordinate((i_BoardSize / 2) - 1, (i_BoardSize / 2)), new sMatrixCoordinate((i_BoardSize / 2), (i_BoardSize / 2) - 1));
             m_CurrentPlayer = m_FirstPlayer;
 
             m_GameAgainstComputer = i_AginstComputer;
 
-            m_GameBoard = instantiateBoard(i_BoardSize);
-            
+            m_GameBoard = instantiateBoard(i_BoardSize);  
+        }
+
+        //public eBoardCell this[int i_I, int i_J]
+        //{
+        //    set
+        //    {
+        //        m_GameBoard[i_I, i_J] = value;
+        //    }
+        //    get
+        //    {
+        //        return m_GameBoard[]
+        //    }
+        //}
+
+        public eBoardCell[,] Board
+        {
+            get
+            {
+                return m_GameBoard;
+            }
+        }
+
+        public Player CurrentPlayer
+        {
+            get
+            {
+                return m_CurrentPlayer;
+            }
+        }
+
+        public Player FirstPlayer
+        {
+            get
+            {
+                return m_FirstPlayer;
+            }
+        }
+
+        public Player SecondPlayer
+        {
+            get
+            {
+                return m_SecondPlayer;
+            }
+        }
+
+        public bool IsAgainstComputer
+        {
+            get
+            {
+                return m_GameAgainstComputer;
+            }
         }
 
         private eBoardCell[,] instantiateBoard(int i_BoardSize)
@@ -91,5 +140,15 @@ namespace Othello
             return leader;
         }
 
+        public void Restart()
+        {
+            int sizeOfBoard = m_GameBoard.Length;
+            m_GameBoard = instantiateBoard(sizeOfBoard);
+
+            m_FirstPlayer.Restart(new sMatrixCoordinate((sizeOfBoard / 2) - 1, (sizeOfBoard / 2) - 1), new sMatrixCoordinate((sizeOfBoard / 2), (sizeOfBoard / 2)));
+            m_SecondPlayer.Restart(new sMatrixCoordinate((sizeOfBoard / 2) - 1, (sizeOfBoard / 2)), new sMatrixCoordinate((sizeOfBoard / 2), (sizeOfBoard / 2) - 1));
+
+            m_CurrentPlayer = m_FirstPlayer;
+        }
     }
 }

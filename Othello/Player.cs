@@ -10,13 +10,14 @@ namespace Othello
         private int m_CurrScore;
         private eColor m_Color;
         private List<sMatrixCoordinate> m_ValidMoves;
-        private List<sMatrixCoordinate> cellsOccupied;
+        private List<sMatrixCoordinate> m_CellsOccupied;
 
-        public Player(string i_Name, eColor i_Color) 
+        public Player(string i_Name, eColor i_Color, sMatrixCoordinate i_FirstCoinPosition, sMatrixCoordinate i_SecondCoindPosition) 
         {
             m_Name = i_Name;
             m_Color = i_Color;
-            //instantiate cellsOccupied
+            m_CellsOccupied.Add(i_FirstCoinPosition);
+            m_CellsOccupied.Add(i_SecondCoindPosition);
         }
 
         public string Name
@@ -47,6 +48,22 @@ namespace Othello
             }
         }
 
+        public List<sMatrixCoordinate> CellsOccupied
+        {
+            get
+            {
+                return m_CellsOccupied;
+            }
+        }
+
+        public List<sMatrixCoordinate> ValidMoves
+        {
+            get
+            {
+                return m_ValidMoves;
+            }
+        }
+
         public bool HasValidMoves()
         {
             bool hasMoves = (m_ValidMoves.Count != 0);
@@ -57,6 +74,15 @@ namespace Othello
         public void GetValidMoves()
         {
             //todo
+        }
+
+        public void Restart(sMatrixCoordinate i_FirstCoinPosition, sMatrixCoordinate i_SecondCoindPosition)
+        {
+            m_ValidMoves.Clear();
+            m_CellsOccupied.Clear();
+
+            m_CellsOccupied.Add(i_FirstCoinPosition);
+            m_CellsOccupied.Add(i_SecondCoindPosition);
         }
     }
 }

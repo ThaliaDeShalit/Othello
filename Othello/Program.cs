@@ -17,6 +17,7 @@ namespace Othello
             GameState currGameState;
             GameOperations gameOperator;
             Board currBoardState;
+            bool exitGame = false;
 
             firstPlayerName = getName();
             boardSize = getBoardSize();
@@ -29,25 +30,30 @@ namespace Othello
             while (true)
             {
                 Screen.Clear();
-                currBoardState.DrawBoard(currGameState.gameBoard);
+                currBoardState.DrawBoard(currGameState.Board);
 
-                if (currGameState.GameOver)
+                if (currGameState.GameOver())
                 {
-                    endGame(currGameState);
+                    endGame(currGameState, out exitGame);
                 }
-                else if (!currGameState.HasValidMoves)
+                else if (!currGameState.CurrentPlayer.HasValidMoves())
                 {
                     currGameState.NextTurn();
                     continue;
                 }
                 else
                 {
-                    move = getNextMove(currGameState);
+                    move = getNextMove(currGameState, out exitGame);
                     gameOperator.update(move);
+                }
+
+                if (exitGame)
+                {
+                    break;
                 }
             }
 
-
+            Console.WriteLine("Thanks for playing!");
         }
 
         private string getName()
@@ -123,14 +129,16 @@ namespace Othello
             return playAgainstComputer;
         }
 
-        private void endGame(GameState currGameState)
+        private void endGame(GameState currGameState, out bool o_WantsToQuitGame)
         {
             bool inputIsValid = false;
             string inputFromUser;
             string gameInformation = string.Format(@"{0} is the winner!
 {1} has {2} coins on the board
-{3} has {4} coins on the board", currGameState.GetLeader().Name, currGameState.firstPlayer.Name, currGameState.firstPlayer.cellsThisPlayerOccupies.Count, 
-                               currGameState.secondPlayer.Name, currGameState.secondPlayer.cellsThisPlayerOccupies.Count);
+{3} has {4} coins on the board", currGameState.GetLeader().Name, currGameState.FirstPlayer.Name, currGameState.FirstPlayer.CellsOccupied.Count, 
+                               currGameState.SecondPlayer.Name, currGameState.SecondPlayer.CellsOccupied.Count);
+
+            o_WantsToQuitGame = false;
 
             Console.WriteLine(gameInformation);
             Console.WriteLine("Would you like to play another game? [y/n]");
@@ -139,14 +147,15 @@ namespace Othello
                 inputFromUser = Console.ReadLine();
                 if (inputFromUser.Equals("y") || inputFromUser.Equals("Y"))
                 {
-                    currGameState.restart();
+                    currGameState.Restart();
                     inputIsValid = true;
 
                 }
                 else if (inputFromUser.Equals("n") || inputFromUser.Equals("N"))
                 {
                     inputIsValid = true;
-                    exitGame();
+                    o_WantsToQuitGame = true;
+                    break;
                 }
                 else
                 {
@@ -155,42 +164,38 @@ namespace Othello
             }
         }
 
-        private void exitGame()
-        {
-            Console.WriteLine("Thanks for playing!");
-            Environment.Exit(0);
-        }
-
-        private sMatrixCoordinate getNextMove(GameState currGameState)
+        private sMatrixCoordinate getNextMove(GameState currGameState, out bool o_WantsToQuitGame)
         {
             sMatrixCoordinate? move = null;
             bool inputIsValid = false;
             string inputFromUser;
             
-            if (currGameState.currentPlayer == currGameState.secondPlayer && currGameState.isAgainstComputer)
+            if (currGameState.CurrentPlayer == currGameState.SecondPlayer && currGameState.IsAgainstComputer)
             {
-                move = currGameState.secondPlayer.MakeMove();
+                move = currGameState.SecondPlayer.MakeMove();
                 Console.WriteLine("Computer made his move");
             }
             else
             {
-                Console.WriteLine(currGameState.currentPlayer.Name + " please enter a move:");
+                Console.WriteLine(currGameState.CurrentPlayer.Name + " please enter a move:");
                 while (!inputIsValid)
                 {
                     inputFromUser = Console.ReadLine();
                     if (inputFromUser.Equals("q") || inputFromUser.Equals("Q"))
                     {
-                        exitGame();
+                        o_WantsToQuitGame = true;
+                        break;
                     }
                     else
                     {
+                        o_WantsToQuitGame = false;
                         inputIsValid = sMatrixCoordinate.TryParse(inputFromUser, out move);
 
                         if (!inputIsValid)
                         {
                             continue;
                         } 
-                        else if (!currGameState.currentPlayer.ValidMoves.Contains(move))
+                        else if (!currGameState.CurrentPlayer.ValidMoves.Contains((sMatrixCoordinate) move))
                         {
                             inputIsValid = false;
                             continue;
@@ -201,6 +206,5 @@ namespace Othello
 
             return (sMatrixCoordinate) move;
         }
-
     }
 }

@@ -27,7 +27,7 @@ namespace Othello
             }
         }
 
-        public void drawBoard(eBoardCell[,] currBoardStatus)
+        public void DrawBoard(eBoardCell[,] currBoardStatus)
         {
             string board;
             int size = currBoardStatus.GetLength(0);
