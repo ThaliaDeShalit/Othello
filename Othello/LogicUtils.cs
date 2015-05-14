@@ -31,7 +31,7 @@ namespace Othello
             }
         }
 
-        static public bool TryParse(string i_StringToParse, out sMatrixCoordinate? o_ResultOfParsing)
+        public static bool TryParse(string i_StringToParse, out sMatrixCoordinate? o_ResultOfParsing)
         {
             bool isValid = true;
             int? newX = null;
@@ -90,6 +90,11 @@ namespace Othello
             o_ResultOfParsing = new sMatrixCoordinate(newX?? 0, newY?? 0);
 
             return isValid;
+        }
+
+        public static sMatrixCoordinate operator +(sMatrixCoordinate i_FirstMatrixCoordiante, sMatrixCoordinate i_SecondMatrixCoordinate)
+        {
+            return new sMatrixCoordinate(i_FirstMatrixCoordiante.x + i_SecondMatrixCoordinate.x, i_FirstMatrixCoordiante.y + i_SecondMatrixCoordinate.y);
         }
     }
 
