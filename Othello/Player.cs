@@ -84,5 +84,13 @@ namespace Othello
             m_CellsOccupied.Add(i_FirstCoinPosition);
             m_CellsOccupied.Add(i_SecondCoindPosition);
         }
+
+        public sMatrixCoordinate MakeMove()
+        {
+            Random rnd = new Random(); 
+            int randomNumber = rnd.Next() % m_ValidMoves.Count;
+
+            return m_ValidMoves[randomNumber];
+        }
     }
 }

@@ -169,7 +169,9 @@ namespace Othello
             sMatrixCoordinate? move = null;
             bool inputIsValid = false;
             string inputFromUser;
-            
+
+            o_WantsToQuitGame = false;
+
             if (currGameState.CurrentPlayer == currGameState.SecondPlayer && currGameState.IsAgainstComputer)
             {
                 move = currGameState.SecondPlayer.MakeMove();
@@ -188,7 +190,6 @@ namespace Othello
                     }
                     else
                     {
-                        o_WantsToQuitGame = false;
                         inputIsValid = sMatrixCoordinate.TryParse(inputFromUser, out move);
 
                         if (!inputIsValid)
