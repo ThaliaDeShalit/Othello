@@ -11,6 +11,7 @@ namespace Othello
         private Player m_CurrentPlayer;
         private bool m_GameAgainstComputer;
         private eBoardCell[,] m_GameBoard;
+        private sMatrixCoordinate? m_LastMove;
 
         public GameState(string i_FirstPlayerName, string i_SecondPlayerName, int i_BoardSize, bool i_AginstComputer)
         {
@@ -28,6 +29,26 @@ namespace Othello
             get
             {
                 return m_GameBoard;
+            }
+        }
+
+        public int BoardSize
+        {
+            get
+            {
+                return (int)Math.Sqrt(Board.Length);
+            }
+        }
+
+        public sMatrixCoordinate? LastMovePlayed
+        {
+            set
+            {
+                m_LastMove = value;
+            }
+            get
+            {
+                return m_LastMove;
             }
         }
 
@@ -92,7 +113,7 @@ namespace Othello
         {
             bool isGameOver = true;
 
-            if (m_FirstPlayer.HasValidMoves() && m_SecondPlayer.HasValidMoves())
+            if (m_FirstPlayer.HasValidMoves() || m_SecondPlayer.HasValidMoves())
             {
                 isGameOver = false;
             }
@@ -130,7 +151,7 @@ namespace Othello
 
         public void Restart()
         {
-            int sizeOfBoard = m_GameBoard.Length;
+            int sizeOfBoard = BoardSize;
             m_GameBoard = instantiateBoard(sizeOfBoard);
 
             m_FirstPlayer.Restart(new sMatrixCoordinate((sizeOfBoard / 2) - 1, (sizeOfBoard / 2) - 1), new sMatrixCoordinate((sizeOfBoard / 2), (sizeOfBoard / 2)));

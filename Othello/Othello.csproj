@@ -32,10 +32,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Board.cs" />
+    <Compile Include="UI.cs" />
     <Compile Include="GameOperations.cs" />
     <Compile Include="GameState.cs" />
     <Compile Include="LogicUtils.cs" />
+    <Compile Include="OthelloGame.cs" />
     <Compile Include="Player.cs" />
     <Compile Include="Program.cs" />
   </ItemGroup>

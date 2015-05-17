@@ -18,6 +18,8 @@ namespace Othello
             m_Color = i_Color;
             m_CellsOccupied.Add(i_FirstCoinPosition);
             m_CellsOccupied.Add(i_SecondCoindPosition);
+
+            m_CurrScore = 0;
         }
 
         public string Name
@@ -32,7 +34,7 @@ namespace Othello
         {
             set
             {
-                m_CurrScore = Score;
+                m_CurrScore = value;
             }
             get
             {
