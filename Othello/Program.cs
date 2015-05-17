@@ -7,7 +7,7 @@ namespace Othello
 {
     class Program
     {
-        public void Main()
+        public static void Main()
         {
             string firstPlayerName;
             string secondPlayerName;
@@ -23,12 +23,15 @@ namespace Othello
             boardSize = getBoardSize();
             isGameAgainstComputer = playAgainstComputer(out secondPlayerName);
 
-            // Initiate GameState according to stats
-            //Initate GameOperations
+            currGameState = new GameState(firstPlayerName, secondPlayerName, boardSize, isGameAgainstComputer);
+            gameOperator = new GameOperations(currGameState);
             currBoardState = new Board(boardSize);
 
             while (true)
             {
+                gameOperator.CalcValidMoves(currGameState.FirstPlayer);
+                gameOperator.CalcValidMoves(currGameState.SecondPlayer);
+                
                 Screen.Clear();
                 currBoardState.DrawBoard(currGameState.Board);
 
@@ -43,8 +46,12 @@ namespace Othello
                 }
                 else
                 {
+                   
+                    
                     move = getNextMove(currGameState, out exitGame);
-                    gameOperator.update(move);
+
+                    
+                    gameOperator.UpdateGame(move);
                 }
 
                 if (exitGame)
@@ -56,7 +63,7 @@ namespace Othello
             Console.WriteLine("Thanks for playing!");
         }
 
-        private string getName()
+        private static string getName()
         {
             string nameOfPlayer = String.Empty;
             bool isValidName = false;
@@ -78,7 +85,7 @@ namespace Othello
             return nameOfPlayer;
         }
 
-        private int getBoardSize()
+        private static int getBoardSize()
         {
             string inputFromUserForBoardSize;
             int sizeOfBoard = 0;
@@ -102,7 +109,8 @@ namespace Othello
             return sizeOfBoard;
         }
 
-        private bool playAgainstComputer(out string o_NameOfSecondPlayer) {
+        private static bool playAgainstComputer(out string o_NameOfSecondPlayer)
+        {
             string inputFromUser;
             bool playAgainstComputer = false;
             bool inputIsValid = false;
@@ -124,12 +132,16 @@ namespace Othello
                     o_NameOfSecondPlayer = getName();
                     inputIsValid = true;
                 }
+                else
+                {
+                    Console.WriteLine("A valid input is either c for computer or p for player, please enter a valid input:");
+                }
             }
 
             return playAgainstComputer;
         }
 
-        private void endGame(GameState currGameState, out bool o_WantsToQuitGame)
+        private static void endGame(GameState currGameState, out bool o_WantsToQuitGame)
         {
             bool inputIsValid = false;
             string inputFromUser;
@@ -164,7 +176,7 @@ namespace Othello
             }
         }
 
-        private sMatrixCoordinate getNextMove(GameState currGameState, out bool o_WantsToQuitGame)
+        private static sMatrixCoordinate getNextMove(GameState currGameState, out bool o_WantsToQuitGame)
         {
             sMatrixCoordinate? move = null;
             bool inputIsValid = false;
@@ -192,20 +204,16 @@ namespace Othello
                     {
                         inputIsValid = sMatrixCoordinate.TryParse(inputFromUser, out move);
 
-                        if (!inputIsValid)
+                        if (!currGameState.CurrentPlayer.ValidMoves.Contains((sMatrixCoordinate) move))
                         {
-                            continue;
-                        } 
-                        else if (!currGameState.CurrentPlayer.ValidMoves.Contains((sMatrixCoordinate) move))
-                        {
+                            Console.WriteLine("You can not preform that move, pick a valid move:");
                             inputIsValid = false;
-                            continue;
                         }
                     }
                 }
             }
 
-            return (sMatrixCoordinate) move;
+            return move?? new sMatrixCoordinate(0, 0);
         }
     }
 }

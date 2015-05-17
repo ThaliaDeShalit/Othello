@@ -9,11 +9,11 @@ namespace Othello
         private string m_Name;
         private int m_CurrScore;
         private eColor m_Color;
-        private List<sMatrixCoordinate> m_ValidMoves;
-        private List<sMatrixCoordinate> m_CellsOccupied;
+        private List<sMatrixCoordinate> m_ValidMoves = new List<sMatrixCoordinate>();
+        private List<sMatrixCoordinate> m_CellsOccupied = new List<sMatrixCoordinate>();
 
         public Player(string i_Name, eColor i_Color, sMatrixCoordinate i_FirstCoinPosition, sMatrixCoordinate i_SecondCoindPosition) 
-        {
+        {            
             m_Name = i_Name;
             m_Color = i_Color;
             m_CellsOccupied.Add(i_FirstCoinPosition);
@@ -71,10 +71,19 @@ namespace Othello
             return hasMoves;
         }
 
-        public void GetValidMoves()
-        {
-            //todo
-        }
+        //public void GetValidMoves()
+        //{
+        //    foreach (sMatrixCoordinate direction in m_directions)
+        //    {
+        //        sMatrixCoordinate newCoordinate = move + direction;
+        //        eBoardCell adjacentCell = m_CurrentGameState.Board[newCoordinate.x, newCoordinate.y];
+
+        //        if (!adjacentCell.Equals(eBoardCell.Empty) && !adjacentCell.Equals((eBoardCell)m_CurrentGameState.CurrentPlayer.Color))
+        //        {
+        //            Flip(newCoordinate, direction, adjacentCell);
+        //        }
+        //    }
+        //}
 
         public void Restart(sMatrixCoordinate i_FirstCoinPosition, sMatrixCoordinate i_SecondCoindPosition)
         {

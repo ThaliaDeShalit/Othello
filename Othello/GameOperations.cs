@@ -8,16 +8,53 @@ namespace Othello
     {
         private GameState m_CurrentGameState;
 
+        private sMatrixCoordinate m_UpLeft = new sMatrixCoordinate(-1, -1);
+        private sMatrixCoordinate m_Up = new sMatrixCoordinate(0, -1);
+        private sMatrixCoordinate m_UpRight = new sMatrixCoordinate(1, -1);
+        private sMatrixCoordinate m_Left = new sMatrixCoordinate(-1, 0);
+        private sMatrixCoordinate m_Right = new sMatrixCoordinate(1, 0);
+        private sMatrixCoordinate m_DownLeft = new sMatrixCoordinate(-1, 1);
+        private sMatrixCoordinate m_Down = new sMatrixCoordinate(0, 1);
+        private sMatrixCoordinate m_DownRight = new sMatrixCoordinate(1, 1);
+
+        private sMatrixCoordinate[] m_directions;
+
         public GameOperations(GameState i_GameState)
         {
             m_CurrentGameState = i_GameState;
+
+            m_directions = new sMatrixCoordinate[8] { m_UpLeft, m_Up, m_UpRight, m_Left, m_Right, m_DownLeft, m_Down, m_DownRight };
         }
 
         public void UpdateGame(sMatrixCoordinate move)
         {
             m_CurrentGameState.Board[move.x, move.y] = (eBoardCell) m_CurrentGameState.CurrentPlayer.Color;
+            m_CurrentGameState.CurrentPlayer.CellsOccupied.Add(move);
 
             //check the cell in every direction (8 directions). If adjacent coin is of the other color, send to checkIfCouldFlipInDirection with that direction
+            foreach (sMatrixCoordinate direction in m_directions)
+            {
+                sMatrixCoordinate newCoordinate = move + direction;
+
+                int boardSize = m_CurrentGameState.Board.Length - 1;
+                if(newCoordinate.x < 0 || newCoordinate.x > boardSize || newCoordinate.y < 0 || newCoordinate.y > boardSize ) {
+                    continue;
+                }
+
+                eBoardCell adjacentCell = m_CurrentGameState.Board[newCoordinate.x, newCoordinate.y];
+
+                if (!adjacentCell.Equals(eBoardCell.Empty) && !adjacentCell.Equals((eBoardCell) m_CurrentGameState.CurrentPlayer.Color))
+                {
+                    sMatrixCoordinate? tempCoord = CheckIfCouldFlipInDirection(newCoordinate, direction, (eBoardCell) m_CurrentGameState.CurrentPlayer.Color);
+
+                    if (tempCoord != null)
+                    {
+                        Flip(newCoordinate, direction, adjacentCell);
+                    }
+                }
+            }
+
+            m_CurrentGameState.NextTurn();
         }
 
         public void CalcScore()
@@ -39,23 +76,143 @@ namespace Othello
             }
         }
 
-        public void Flip(sMatrixCoordinate i_CurrentCoordinate, sMatrixCoordinate i_Direction)
+        public void Flip(sMatrixCoordinate i_CurrentCoordinate, sMatrixCoordinate i_Direction, eBoardCell i_CellType)
         {
-            //flip this cell - update both players cell lists
+            eBoardCell currentBoardCell = m_CurrentGameState.Board[i_CurrentCoordinate.x, i_CurrentCoordinate.y];
+            sMatrixCoordinate newCoordinate = i_CurrentCoordinate + i_Direction;
+            eBoardCell adjacentCell = m_CurrentGameState.Board[newCoordinate.x, newCoordinate.y];
+            
             //check if next cell is of same color - if yes, send recursively. if not, we flipped all in this direction and can stop
-        }
-
-        public class CoinFlipper
-        {
-            public sMatrixCoordinate CheckIfCouldFlipInDirection(sMatrixCoordinate currentCoordinate, sMatrixCoordinate direction, eBoardCell cellType)
+            if (adjacentCell.Equals(currentBoardCell))
             {
-                //if adjacent cell in given direction is a coin of cellType - return MatrixCoordinate of that cell
-                //if adjacent cell is the third kind of cell (not same as me, not same as cellType) or out of board bounds - return null
-                //if adjacent cell is same color - send recursively with updated currentCoordinate (of the adjacent cell) and same direction
+                Flip(newCoordinate, i_Direction, adjacentCell);
+            }
 
-                return new sMatrixCoordinate(0, 0);
-            } 
+            //flip this cell - update both players cell lists
+            if (currentBoardCell.Equals(eBoardCell.Black))
+            {
+                m_CurrentGameState.Board[i_CurrentCoordinate.x, i_CurrentCoordinate.y] = eBoardCell.White;
+            }
+            else
+            {
+                m_CurrentGameState.Board[i_CurrentCoordinate.x, i_CurrentCoordinate.y] = eBoardCell.Black;
+            }
 
+            if (m_CurrentGameState.CurrentPlayer.Equals(m_CurrentGameState.FirstPlayer))
+            {
+                m_CurrentGameState.SecondPlayer.CellsOccupied.Remove(i_CurrentCoordinate);
+            }
+            else
+            {
+                m_CurrentGameState.FirstPlayer.CellsOccupied.Remove(i_CurrentCoordinate);
+            }
+            m_CurrentGameState.CurrentPlayer.CellsOccupied.Add(i_CurrentCoordinate);
         }
+
+        public void CalcValidMoves(Player i_Player)
+        {
+            i_Player.ValidMoves.Clear();
+            
+            sMatrixCoordinate? matrixCoord = null;
+            
+            foreach (sMatrixCoordinate cellOccupied in i_Player.CellsOccupied)
+            {
+                eBoardCell currentBoardCell = m_CurrentGameState.Board[cellOccupied.x, cellOccupied.y];
+                
+                foreach (sMatrixCoordinate direction in m_directions)
+                {
+                    sMatrixCoordinate newCoordinate = cellOccupied + direction;
+
+                    int boardSize = m_CurrentGameState.Board.Length - 1;
+                    if (newCoordinate.x < 0 || newCoordinate.x > boardSize || newCoordinate.y < 0 || newCoordinate.y > boardSize)
+                    {
+                        continue;
+                    }
+
+                    eBoardCell adjacentCell = m_CurrentGameState.Board[newCoordinate.x, newCoordinate.y];
+
+
+                    if (!currentBoardCell.Equals(adjacentCell) && !adjacentCell.Equals(eBoardCell.Empty))
+                    {
+                        matrixCoord = CheckIfCouldFlipInDirection(newCoordinate, direction, eBoardCell.Empty);
+                    }
+
+                    if (matrixCoord != null)
+                    {
+                        if (!i_Player.ValidMoves.Contains((sMatrixCoordinate) matrixCoord))
+                        {
+                            i_Player.ValidMoves.Add((sMatrixCoordinate) matrixCoord);
+                        }
+                    }
+                }
+            }
+            
+        }
+
+        public sMatrixCoordinate? CheckIfCouldFlipInDirection(sMatrixCoordinate i_currentCoordinate, sMatrixCoordinate i_direction, eBoardCell i_CellType)
+        {
+            sMatrixCoordinate? returnedCoordinate = null;
+            sMatrixCoordinate newCoordinate = i_currentCoordinate + i_direction;
+
+            int boardSize = m_CurrentGameState.Board.Length - 1;
+            if (!(newCoordinate.x < 0 || newCoordinate.x > boardSize || newCoordinate.y < 0 || newCoordinate.y > boardSize))
+            {
+                eBoardCell adjacentCell = m_CurrentGameState.Board[newCoordinate.x, newCoordinate.y];
+
+                //if adjacent cell in given direction is a coin of cellType - return MatrixCoordinate of that cell
+                if (adjacentCell.Equals(i_CellType))
+                {
+                    returnedCoordinate = newCoordinate;
+                }
+                //if adjacent cell is the third kind of cell (not same as me, not same as cellType) or out of board bounds - return null
+                else if (!adjacentCell.Equals(m_CurrentGameState.Board[i_currentCoordinate.x, i_currentCoordinate.y]))
+                {
+                    returnedCoordinate = null;
+                }
+                //if adjacent cell is same color - send recursively with updated currentCoordinate (of the adjacent cell) and same direction
+                else
+                {
+                    returnedCoordinate = CheckIfCouldFlipInDirection(newCoordinate, i_direction, i_CellType);
+                }   
+            }
+
+            return returnedCoordinate;
+        } 
+
+        //public class CoinFlipper
+        //{
+        //    private GameOperations m_GameOperator;
+
+        //    public CoinFlipper(GameOperations i_GameOperator)
+        //    {
+        //        m_GameOperator = i_GameOperator;
+        //    }
+            
+        //    public sMatrixCoordinate? CheckIfCouldFlipInDirection(sMatrixCoordinate i_currentCoordinate, sMatrixCoordinate i_direction, eBoardCell i_cellType)
+        //    {
+        //        sMatrixCoordinate? returnedCoordinate = null;
+        //        sMatrixCoordinate newCoordinate = i_currentCoordinate + i_direction;
+        //        eBoardCell adjacentCell = m_GameOperator.m_CurrentGameState.Board[newCoordinate.x, newCoordinate.y];
+
+        //        //if adjacent cell in given direction is a coin of cellType - return MatrixCoordinate of that cell
+        //        if (adjacentCell.Equals(i_cellType))
+        //        {
+        //            returnedCoordinate = newCoordinate;
+        //        }
+        //        //if adjacent cell is the third kind of cell (not same as me, not same as cellType) or out of board bounds - return null
+        //        else if (!adjacentCell.Equals(m_GameOperator.m_CurrentGameState.Board[i_currentCoordinate.x, i_currentCoordinate.y]))
+        //        {
+        //            returnedCoordinate = null;
+        //        }
+        //        //if adjacent cell is same color - send recursively with updated currentCoordinate (of the adjacent cell) and same direction
+        //        else
+        //        {
+        //            returnedCoordinate = CheckIfCouldFlipInDirection(newCoordinate, i_direction, i_cellType);
+        //        }
+
+        //        return returnedCoordinate;
+        //    } 
+
+       // }
     }
 }

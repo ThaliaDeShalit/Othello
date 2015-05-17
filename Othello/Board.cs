@@ -6,10 +6,10 @@ namespace Othello
 {
     class Board
     {
-        private readonly string r_EmptyCell = "|    ";
+        private readonly string r_EmptyCell = "|   ";
         private readonly string r_BlackCell = "| X ";
         private readonly string r_WhiteCell = "| O ";
-        private readonly string r_LineEnd = "|    ";
+        private readonly string r_LineEnd = "|";
         private readonly string r_LineSeperator;
         private readonly string r_FirstLine;
 
@@ -17,13 +17,13 @@ namespace Othello
         {
             if (size == 6)
             {
-                r_LineSeperator = "=========================";
-                r_FirstLine = " A   B   C   D   E   F";
+                r_LineSeperator = "  =========================";
+                r_FirstLine = "    A   B   C   D   E   F";
             }
             else
             {
-                r_LineSeperator = "=================================";
-                r_FirstLine = " A   B   C   D   E   F   G   H";
+                r_LineSeperator = "  =================================";
+                r_FirstLine = "    A   B   C   D   E   F   G   H";
             }
         }
 
@@ -40,11 +40,11 @@ namespace Othello
                 sb.Append(" ");
                 for (int j = 0; j < size; j++)
                 {
-                    if (currBoardStatus[i, j] == eBoardCell.Black)
+                    if (currBoardStatus[j, i] == eBoardCell.Black)
                     {
                         sb.Append(r_BlackCell);
                     }
-                    else if (currBoardStatus[i, j] == eBoardCell.White)
+                    else if (currBoardStatus[j, i] == eBoardCell.White)
                     {
                         sb.Append(r_WhiteCell);
                     }
@@ -71,7 +71,7 @@ namespace Othello
 {6}
 {1}
 {7}
-{1}", r_FirstLine, r_LineSeperator, linesInBoard);
+{1}", r_FirstLine, r_LineSeperator, linesInBoard[0], linesInBoard[1], linesInBoard[2], linesInBoard[3], linesInBoard[4], linesInBoard[5]);
 
             if (size == 8)
             {

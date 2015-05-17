@@ -14,26 +14,14 @@ namespace Othello
 
         public GameState(string i_FirstPlayerName, string i_SecondPlayerName, int i_BoardSize, bool i_AginstComputer)
         {
-            m_FirstPlayer = new Player(i_FirstPlayerName, eColor.Black, new sMatrixCoordinate((i_BoardSize / 2) - 1, (i_BoardSize / 2) - 1), new sMatrixCoordinate((i_BoardSize / 2), (i_BoardSize / 2)));
-            m_SecondPlayer = new Player(i_SecondPlayerName, eColor.White, new sMatrixCoordinate((i_BoardSize / 2) - 1, (i_BoardSize / 2)), new sMatrixCoordinate((i_BoardSize / 2), (i_BoardSize / 2) - 1));
+            m_FirstPlayer = new Player(i_FirstPlayerName, eColor.Black, new sMatrixCoordinate((i_BoardSize / 2) - 1, (i_BoardSize / 2)), new sMatrixCoordinate((i_BoardSize / 2), (i_BoardSize / 2) - 1));
+            m_SecondPlayer = new Player(i_SecondPlayerName, eColor.White, new sMatrixCoordinate((i_BoardSize / 2) - 1, (i_BoardSize / 2) - 1), new sMatrixCoordinate((i_BoardSize / 2), (i_BoardSize / 2)));
             m_CurrentPlayer = m_FirstPlayer;
 
             m_GameAgainstComputer = i_AginstComputer;
 
             m_GameBoard = instantiateBoard(i_BoardSize);  
         }
-
-        //public eBoardCell this[int i_I, int i_J]
-        //{
-        //    set
-        //    {
-        //        m_GameBoard[i_I, i_J] = value;
-        //    }
-        //    get
-        //    {
-        //        return m_GameBoard[]
-        //    }
-        //}
 
         public eBoardCell[,] Board
         {
@@ -102,11 +90,11 @@ namespace Othello
 
         public bool GameOver()
         {
-            bool isGameOver = false;
+            bool isGameOver = true;
 
             if (m_FirstPlayer.HasValidMoves() && m_SecondPlayer.HasValidMoves())
             {
-                isGameOver = true;
+                isGameOver = false;
             }
 
             return isGameOver;
